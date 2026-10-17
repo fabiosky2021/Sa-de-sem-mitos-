@@ -1,0 +1,6 @@
+{
+  "name": "Saúde Sem Mitos - Estúdio Criativo",
+  "description": "Estúdio multimodal de criação de conteúdo educativo em saúde, nutrição e bem-estar, com entrada por voz, análise visual por IA, calendário editorial semanal e reprodutor com legendas.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
