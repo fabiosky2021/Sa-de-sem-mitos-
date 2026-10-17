@@ -66,16 +66,43 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
         utter.volume = isMuted ? 0 : 1;
 
         const voices = window.speechSynthesis.getVoices();
-        const ptVoice = voices.find(
-          (v) =>
-            v.lang.startsWith('pt') &&
-            (v.name.includes('Luciana') ||
-              v.name.includes('Francisca') ||
-              v.name.includes('Google') ||
-              v.name.includes('Natural'))
-        ) || voices.find((v) => v.lang.startsWith('pt'));
+        let targetVoice: SpeechSynthesisVoice | undefined;
 
-        if (ptVoice) utter.voice = ptVoice;
+        if (selectedVoiceId === 'gemini-fenrir') {
+          // Dr. Thiago Mello (Clínico Masculino)
+          utter.pitch = 0.88;
+          utter.rate = (isNaN(rateVal) ? 1.0 : rateVal) * 0.98;
+          targetVoice = voices.find(
+            (v) =>
+              v.lang.startsWith('pt') &&
+              (v.name.toLowerCase().includes('daniel') ||
+                v.name.toLowerCase().includes('thiago') ||
+                v.name.toLowerCase().includes('antonio') ||
+                v.name.toLowerCase().includes('homem') ||
+                v.name.toLowerCase().includes('male') ||
+                v.name.toLowerCase().includes('faber'))
+          );
+        } else {
+          // Dra. Camila (Voz Principal Feminina, acolhedora e expressiva)
+          utter.pitch = 1.06;
+          utter.rate = isNaN(rateVal) ? 1.0 : rateVal;
+          targetVoice = voices.find(
+            (v) =>
+              v.lang.startsWith('pt') &&
+              (v.name.toLowerCase().includes('camila') ||
+                v.name.toLowerCase().includes('francisca') ||
+                v.name.toLowerCase().includes('leticia') ||
+                v.name.toLowerCase().includes('fernanda') ||
+                v.name.toLowerCase().includes('google') ||
+                v.name.toLowerCase().includes('natural'))
+          );
+        }
+
+        if (!targetVoice) {
+          targetVoice = voices.find((v) => v.lang.startsWith('pt'));
+        }
+
+        if (targetVoice) utter.voice = targetVoice;
 
         utter.onend = () => {
           speakSentence(idx + 1);
@@ -143,6 +170,16 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
     };
   }, []);
 
+  const handleQuickVoiceChange = (voiceId: string) => {
+    if (onSelectQuickVoice) onSelectQuickVoice(voiceId);
+    if (isPlaying && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        togglePlay();
+      }, 100);
+    }
+  };
+
   return (
     <div className="w-full bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm border border-outline-variant/30">
       {/* Header with Title and CC Toggle */}
@@ -177,7 +214,7 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
             <div className="flex items-center gap-1 my-0.5">
               <button
                 type="button"
-                onClick={() => onSelectQuickVoice?.('gemini-zephyr')}
+                onClick={() => handleQuickVoiceChange('gemini-zephyr')}
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition cursor-pointer flex items-center gap-0.5 ${
                   selectedVoiceId === 'gemini-zephyr'
                     ? 'bg-primary text-on-primary shadow-xs ring-1 ring-primary'
@@ -189,7 +226,7 @@ export const AudioControls: React.FC<AudioControlsProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => onSelectQuickVoice?.('gemini-fenrir')}
+                onClick={() => handleQuickVoiceChange('gemini-fenrir')}
                 className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition cursor-pointer flex items-center gap-0.5 ${
                   selectedVoiceId === 'gemini-fenrir'
                     ? 'bg-[#006398] text-white shadow-xs ring-1 ring-[#006398]'

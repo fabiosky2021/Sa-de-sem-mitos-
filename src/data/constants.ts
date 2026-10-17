@@ -88,8 +88,8 @@ export const PROTO_CHAMOMILE_ARTICLE: GeneratedArticle = {
   subtitulo: 'Entre o saber popular e os ensaios clínicos randomizados: investigamos como os flavonoides botânicos atuam diretamente nos neurotransmissores cerebrais.',
   resumo: 'Investigamos os compostos bioativos da camomila e cidreira com foco no papel da apigenina nos receptores GABA-A e no ácido rosmarínico na inibição da enzima GABA transaminase.',
   reviewer: {
-    name: 'Dra. Helena Rios',
-    role: 'Neurologista Clínica • CRM-SP 149.204',
+    name: 'Dra. Camila Duarte',
+    role: 'Nutricionista & Fisiologista Clínica • CRN-3 48.219',
     avatar: ASSETS.doctorHelena
   },
   video: {

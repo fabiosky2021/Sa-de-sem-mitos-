@@ -44,12 +44,12 @@ export const AVAILABLE_VOICES: VoiceOption[] = [
   },
   {
     id: 'browser-natural',
-    name: 'Dra. Helena Rios (Voz Neural Local)',
+    name: 'Voz Neural Local do Dispositivo',
     gender: 'female',
     tag: 'Web Speech pt-BR',
     source: 'browser',
-    description: 'Utiliza as vozes neurais brasileiras instaladas no seu dispositivo (como Francisca ou Luciana Natural).',
-    sampleText: 'Revisão médica baseada em meta-análises e diretrizes das sociedades de especialidade.',
+    description: 'Sintetizador de voz neural do seu sistema operacional/navegador em português.',
+    sampleText: 'Conteúdo educativo revisado com base em meta-análises científicas.',
   },
 ];
 

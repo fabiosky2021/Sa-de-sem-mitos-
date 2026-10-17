@@ -14,6 +14,7 @@ import { MythsView } from './components/MythsView';
 import { VoiceSettingsModal, AVAILABLE_VOICES } from './components/VoiceSettingsModal';
 import { GeneratedArticle, PillarDay } from './types/content';
 import { PROTO_CHAMOMILE_ARTICLE, PROTO_MYTH_ARTICLE, INITIAL_ARTICLES_LIST, ASSETS } from './data/constants';
+import { requestContentGeneration } from './services/contentService';
 
 const STORAGE_KEY = 'saude_sem_mitos_articles_v2';
 const VOICE_STORAGE_KEY = 'saude_sem_mitos_voice_id';
@@ -90,17 +91,7 @@ export default function App() {
     setErrorMessage(null);
 
     try {
-      const response = await fetch('/api/content/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Servidor retornou status ${response.status}`);
-      }
-
-      const res = await response.json();
+      const res = await requestContentGeneration(data);
 
       const newArticle: GeneratedArticle = {
         id: `art-${Date.now()}`,
@@ -115,8 +106,8 @@ export default function App() {
         subtitulo: res.subtitulo || res.resumo || '',
         resumo: res.resumo || '',
         reviewer: {
-          name: 'Dra. Helena Rios',
-          role: 'Neurologista Clínica • CRM-SP 149.204',
+          name: 'Dra. Camila Duarte',
+          role: 'Nutricionista & Fisiologista Clínica • CRN-3 48.219',
           avatar: ASSETS.doctorHelena,
         },
         video: {
@@ -163,7 +154,13 @@ export default function App() {
         dicas_praticas: res.dicas_praticas || [],
         analise_visual: res.analise_visual,
         imagePreview: data.imagePreview,
-        roteiro_video: res.roteiro_video,
+        roteiro_video: res.roteiro_video || {
+          titulo_video: res.titulo,
+          gancho_inicial: 'Veja o que a ciência comprova sobre este tema!',
+          desenvolvimento: res.resumo,
+          chamada_para_acao: 'Compartilhe com quem precisa saber a verdade!',
+          legendas_sugeridas: ['0:00 - Introdução', '0:20 - Evidência científica', '0:50 - Conclusão prática'],
+        },
         audio_script: res.audio_script || res.resumo,
         tags: res.tags || ['SaudeSemMitos'],
         referencias_cientificas: (res.referencias_cientificas || []).map((ref: string) => ({
