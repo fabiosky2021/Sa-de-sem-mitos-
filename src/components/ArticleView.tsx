@@ -28,14 +28,14 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   const getPillarBadgeClasses = (pilarId: string) => {
     switch (pilarId) {
       case 'quarta':
-        return 'bg-[#F0FDF4] text-[#166534]';
+        return 'bg-[#F0FDF4] text-[#166534] dark:bg-emerald-950/70 dark:text-emerald-300 dark:border dark:border-emerald-800/40';
       case 'segunda':
-        return 'bg-[#ECFDF5] text-[#065F46]';
+        return 'bg-[#ECFDF5] text-[#065F46] dark:bg-teal-950/70 dark:text-teal-300 dark:border dark:border-teal-800/40';
       case 'sexta':
-        return 'bg-[#EFF6FF] text-[#1E40AF]';
+        return 'bg-[#EFF6FF] text-[#1E40AF] dark:bg-blue-950/70 dark:text-blue-300 dark:border dark:border-blue-800/40';
       case 'sabado':
       default:
-        return 'bg-[#FFFBEB] text-[#B45309]';
+        return 'bg-[#FFFBEB] text-[#B45309] dark:bg-amber-950/70 dark:text-amber-300 dark:border dark:border-amber-800/40';
     }
   };
 
@@ -164,23 +164,23 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
         {/* Scientific Verdict Callout Badge */}
         {article.verdict && (
-          <div className="w-full bg-[#FFFBEB] rounded-xl p-space-md shadow-sm flex items-start gap-space-sm border border-[#FDE68A]">
-            <div className="w-10 h-10 rounded-full bg-[#FDE68A] flex items-center justify-center text-[#B45309] shrink-0 mt-0.5">
+          <div className="w-full bg-[#FFFBEB] dark:bg-amber-950/30 rounded-xl p-space-md shadow-sm flex items-start gap-space-sm border border-[#FDE68A] dark:border-amber-800/40">
+            <div className="w-10 h-10 rounded-full bg-[#FDE68A] dark:bg-amber-900/60 flex items-center justify-center text-[#B45309] dark:text-amber-300 shrink-0 mt-0.5">
               <span className="material-symbols-outlined text-xl font-bold">balance</span>
             </div>
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-2">
-                <span className="font-label-md text-label-md uppercase tracking-wider text-[#B45309] font-bold">
+                <span className="font-label-md text-label-md uppercase tracking-wider text-[#B45309] dark:text-amber-300 font-bold">
                   Veredito Científico
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-label-sm text-label-sm font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] dark:bg-amber-900/60 text-[#92400E] dark:text-amber-200 font-label-sm text-label-sm font-bold">
                   {article.verdict.evidenceLevel}
                 </span>
               </div>
-              <span className="font-headline-sm text-headline-sm text-[#92400E] font-bold">
+              <span className="font-headline-sm text-headline-sm text-[#92400E] dark:text-amber-200 font-bold">
                 {article.verdict.status}
               </span>
-              <p className="font-body-sm text-body-sm text-[#78350F] mt-1 leading-relaxed">
+              <p className="font-body-sm text-body-sm text-[#78350F] dark:text-amber-100/90 mt-1 leading-relaxed">
                 {article.verdict.summary}
               </p>
             </div>

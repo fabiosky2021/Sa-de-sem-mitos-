@@ -18,9 +18,19 @@ import { requestContentGeneration } from './services/contentService';
 
 const STORAGE_KEY = 'saude_sem_mitos_articles_v2';
 const VOICE_STORAGE_KEY = 'saude_sem_mitos_voice_id';
+const THEME_STORAGE_KEY = 'saude_sem_mitos_theme_v1';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabKey>('artigos');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved !== null) {
+        return saved === 'dark';
+      }
+    } catch {}
+    return true; // Modo escuro ativo por padrão
+  });
   const [selectedVoiceId, setSelectedVoiceId] = useState<string>(() => {
     try {
       return localStorage.getItem(VOICE_STORAGE_KEY) || 'gemini-zephyr';
@@ -56,6 +66,18 @@ export default function App() {
       localStorage.setItem(VOICE_STORAGE_KEY, voiceId);
     } catch {}
   };
+
+  // Sync theme class to html root and localStorage
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, isDarkMode ? 'dark' : 'light');
+    } catch {}
+  }, [isDarkMode]);
 
   // Sync to localStorage
   useEffect(() => {
@@ -224,6 +246,8 @@ export default function App() {
         onLogoClick={() => setActiveTab('inicio')}
         onProfileClick={() => setActiveTab('assistente-ia')}
         onVoiceSettingsClick={() => setIsVoiceModalOpen(true)}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
       />
 
       {/* Main Container */}

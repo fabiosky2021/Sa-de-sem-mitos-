@@ -6,6 +6,8 @@ interface HeaderProps {
   onProfileClick?: () => void;
   onLogoClick?: () => void;
   onVoiceSettingsClick?: () => void;
+  isDarkMode?: boolean;
+  onToggleDarkMode?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -13,9 +15,11 @@ export const Header: React.FC<HeaderProps> = ({
   onProfileClick,
   onLogoClick,
   onVoiceSettingsClick,
+  isDarkMode = true,
+  onToggleDarkMode,
 }) => {
   return (
-    <header className="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-outline-variant/20">
+    <header className="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.06)] border-b border-outline-variant/30">
       <div className="h-16 px-gutter flex items-center justify-between max-w-4xl mx-auto">
         {/* Brand Identity */}
         <div
@@ -45,8 +49,22 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* User Profile & Voice Settings */}
-        <div className="flex items-center gap-1.5 sm:gap-space-sm">
+        {/* User Profile, Theme Toggle & Voice Settings */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Dark Mode Toggle Button */}
+          {onToggleDarkMode && (
+            <button
+              onClick={onToggleDarkMode}
+              title={isDarkMode ? 'Mudar para Modo Claro' : 'Ativar Modo Escuro'}
+              aria-label="Alternar modo escuro ou claro"
+              className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors active:scale-95 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-xl">
+                {isDarkMode ? 'light_mode' : 'dark_mode'}
+              </span>
+            </button>
+          )}
+
           {onVoiceSettingsClick && (
             <button
               onClick={onVoiceSettingsClick}

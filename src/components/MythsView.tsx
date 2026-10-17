@@ -63,19 +63,19 @@ export const MythsView: React.FC<MythsViewProps> = ({
   return (
     <div className="flex flex-col gap-space-lg w-full pb-10">
       {/* Header */}
-      <div className="w-full bg-[#FFFBEB] p-space-lg rounded-2xl border border-[#FDE68A] shadow-sm flex flex-col gap-space-xs">
+      <div className="w-full bg-[#FFFBEB] dark:bg-amber-950/30 p-space-lg rounded-2xl border border-[#FDE68A] dark:border-amber-800/40 shadow-sm flex flex-col gap-space-xs">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[#B45309] text-xl font-bold">
+          <span className="material-symbols-outlined text-[#B45309] dark:text-amber-300 text-xl font-bold">
             verified_user
           </span>
-          <span className="font-label-sm text-label-sm uppercase font-bold text-[#B45309] tracking-wider">
+          <span className="font-label-sm text-label-sm uppercase font-bold text-[#B45309] dark:text-amber-300 tracking-wider">
             Sábados Sem Mitos
           </span>
         </div>
-        <h1 className="font-headline-lg-mobile sm:text-headline-lg font-bold text-[#92400E]">
+        <h1 className="font-headline-lg-mobile sm:text-headline-lg font-bold text-[#92400E] dark:text-amber-200">
           Desmistificador de Crenças Populares & Modismos
         </h1>
-        <p className="font-body-sm text-body-sm text-[#78350F] leading-relaxed">
+        <p className="font-body-sm text-body-sm text-[#78350F] dark:text-amber-100/80 leading-relaxed">
           Avaliamos as principais afirmações virais de redes sociais sob o rigor de ensaios clínicos e diretrizes das sociedades médicas.
         </p>
 
@@ -89,7 +89,7 @@ export const MythsView: React.FC<MythsViewProps> = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Pesquise um mito (ex: limão, detox, glúten, chá)..."
-            className="w-full bg-surface-container-lowest border border-[#FDE68A] rounded-xl pl-9 pr-4 py-2 font-body-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full bg-surface-container-lowest border border-[#FDE68A] dark:border-amber-800/40 rounded-xl pl-9 pr-4 py-2 font-body-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
       </div>
@@ -117,7 +117,7 @@ export const MythsView: React.FC<MythsViewProps> = ({
                   className={`px-2 py-0.5 rounded-full font-label-sm text-[10px] font-bold uppercase shrink-0 ${
                     item.verdict.includes('DESMISTIFICADO')
                       ? 'bg-error-container text-on-error-container'
-                      : 'bg-[#FEF3C7] text-[#92400E]'
+                      : 'bg-[#FEF3C7] dark:bg-amber-900/60 text-[#92400E] dark:text-amber-200'
                   }`}
                 >
                   {item.verdict}
@@ -134,12 +134,12 @@ export const MythsView: React.FC<MythsViewProps> = ({
                   <p className="text-on-surface-variant italic">"{item.myth}"</p>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-[#F0FDF4] border border-primary/20 flex flex-col gap-1">
-                  <span className="font-label-sm text-[#166534] font-bold flex items-center gap-1 uppercase text-[10px]">
+                <div className="p-2.5 rounded-lg bg-[#F0FDF4] dark:bg-emerald-950/40 border border-primary/20 flex flex-col gap-1">
+                  <span className="font-label-sm text-[#166534] dark:text-emerald-300 font-bold flex items-center gap-1 uppercase text-[10px]">
                     <span className="material-symbols-outlined text-sm">check_circle</span>
                     O que a ciência prova:
                   </span>
-                  <p className="text-[#166534] font-medium">{item.reality}</p>
+                  <p className="text-[#166534] dark:text-emerald-200 font-medium">{item.reality}</p>
                 </div>
               </div>
 
