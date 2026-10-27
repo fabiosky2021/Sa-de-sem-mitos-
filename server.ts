@@ -366,7 +366,7 @@ Por favor, elabore o conteúdo estruturado completo conforme o schema JSON solic
 // Endpoint for Speech Generation / Narration via gemini-3.8-flash-lite-tts
 app.post('/api/content/speech', async (req: Request, res: Response) => {
   try {
-    const { text, voiceName } = req.body;
+    const { text, voiceName, voiceId } = req.body;
     if (!text) {
       return res.status(400).json({ error: 'Texto necessário para geração de áudio.' });
     }
@@ -378,6 +378,21 @@ app.post('/api/content/speech', async (req: Request, res: Response) => {
       });
     }
 
+    // Determine style and Gemini voice based on voiceId or voiceName
+    let targetGeminiVoice = voiceName || 'Zephyr';
+    let voiceStyle = 'Calm, authoritative, warm health professional educator in Portuguese';
+
+    if (voiceId === 'github-dessa') {
+      targetGeminiVoice = 'Aoede';
+      voiceStyle = 'Hyper-realistic conversational Brazilian Portuguese, warm, empathetic, natural human pauses and breathing';
+    } else if (voiceId === 'gemini-fenrir') {
+      targetGeminiVoice = 'Fenrir';
+      voiceStyle = 'Male clinical health specialist, didactic and confident in Brazilian Portuguese';
+    } else if (voiceId === 'gemini-zephyr') {
+      targetGeminiVoice = 'Zephyr';
+      voiceStyle = 'Female senior clinical nutritionist, warm, welcoming, and clear in Brazilian Portuguese';
+    }
+
     const ttsResponse = await ai.models.generateContent({
       model: 'gemini-3.8-flash-lite-tts',
       contents: [
@@ -387,7 +402,7 @@ app.post('/api/content/speech', async (req: Request, res: Response) => {
             {
               text: text.slice(0, 1000), // safety bounds
               speechMetadata: {
-                style: 'Calm, authoritative, warm health professional educator in Portuguese',
+                style: voiceStyle,
               },
             },
           ],
@@ -397,7 +412,7 @@ app.post('/api/content/speech', async (req: Request, res: Response) => {
         responseModalities: ['AUDIO'],
         speechConfig: {
           voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: voiceName || 'Kore' },
+            prebuiltVoiceConfig: { voiceName: targetGeminiVoice },
           },
         },
       },

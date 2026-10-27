@@ -39,9 +39,9 @@ export default function App() {
   });
   const [selectedVoiceId, setSelectedVoiceId] = useState<string>(() => {
     try {
-      return localStorage.getItem(VOICE_STORAGE_KEY) || 'gemini-zephyr';
+      return localStorage.getItem(VOICE_STORAGE_KEY) || 'github-dessa';
     } catch {
-      return 'gemini-zephyr';
+      return 'github-dessa';
     }
   });
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
@@ -80,8 +80,25 @@ export default function App() {
     setSelectedVoiceId(voiceId);
     try {
       localStorage.setItem(VOICE_STORAGE_KEY, voiceId);
+      window.dispatchEvent(new CustomEvent('saude_sem_mitos_voice_changed', { detail: voiceId }));
     } catch {}
   };
+
+  // Sync voice if changed from modal or any other component
+  useEffect(() => {
+    const handleVoiceSync = (e: any) => {
+      const newId = e?.detail || localStorage.getItem(VOICE_STORAGE_KEY);
+      if (newId && newId !== selectedVoiceId) {
+        setSelectedVoiceId(newId);
+      }
+    };
+    window.addEventListener('saude_sem_mitos_voice_changed', handleVoiceSync);
+    window.addEventListener('storage', handleVoiceSync);
+    return () => {
+      window.removeEventListener('saude_sem_mitos_voice_changed', handleVoiceSync);
+      window.removeEventListener('storage', handleVoiceSync);
+    };
+  }, [selectedVoiceId]);
 
   // Sync theme class to html root and localStorage
   useEffect(() => {
@@ -265,6 +282,7 @@ export default function App() {
         onDeployClick={() => setIsDeployModalOpen(true)}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
+        activeVoiceName={selectedVoice.name}
       />
 
       {/* Main Container */}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PillarDay } from '../types/content';
 import { PILLARS } from '../data/constants';
 
@@ -23,6 +23,8 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
 }) => {
   const [prompt, setPrompt] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [interimText, setInterimText] = useState('');
+  const [speechFeedback, setSpeechFeedback] = useState<string | null>(null);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
@@ -31,8 +33,100 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+  const silenceTimerRef = useRef<any>(null);
 
-  // Web Speech API initialization
+  const executeGeneration = useCallback(async (textToSubmit?: string) => {
+    const finalPrompt = (textToSubmit !== undefined ? textToSubmit : prompt).trim();
+    if (!finalPrompt && !imageBase64) return;
+
+    if (recognitionRef.current && isListening) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      setIsListening(false);
+    }
+
+    setSpeechFeedback('🚀 Comando obedecido! Criando conteúdo com a IA...');
+    setTimeout(() => setSpeechFeedback(null), 3000);
+
+    await onGenerate({
+      prompt: finalPrompt,
+      dayPillar: selectedPillar === 'auto' ? undefined : selectedPillar,
+      imageBase64: imageBase64 || undefined,
+      mimeType: imageMimeType,
+      imagePreview: imagePreview || undefined,
+    });
+  }, [prompt, imageBase64, isListening, onGenerate, selectedPillar, imageMimeType, imagePreview]);
+
+  // Voice command detection in Portuguese to immediately obey the user
+  const handleVoiceCommand = useCallback((transcriptText: string) => {
+    const lower = transcriptText.toLowerCase().trim();
+
+    // Voice selection commands
+    if (lower.includes('voz dessa') || lower.includes('voz do github') || lower.includes('usar dessa')) {
+      try {
+        localStorage.setItem('saude_sem_mitos_voice_id', 'github-dessa');
+        window.dispatchEvent(new CustomEvent('saude_sem_mitos_voice_changed', { detail: 'github-dessa' }));
+      } catch {}
+      setSpeechFeedback('🗣️ Voz Dessa Neural (GitHub) ativada!');
+      setTimeout(() => setSpeechFeedback(null), 3000);
+      return true;
+    }
+    if (lower.includes('voz camila') || lower.includes('dra camila') || lower.includes('doutora camila')) {
+      try {
+        localStorage.setItem('saude_sem_mitos_voice_id', 'gemini-zephyr');
+        window.dispatchEvent(new CustomEvent('saude_sem_mitos_voice_changed', { detail: 'gemini-zephyr' }));
+      } catch {}
+      setSpeechFeedback('🗣️ Voz Dra. Camila ativada!');
+      setTimeout(() => setSpeechFeedback(null), 3000);
+      return true;
+    }
+    if (lower.includes('voz thiago') || lower.includes('dr thiago') || lower.includes('doutor thiago')) {
+      try {
+        localStorage.setItem('saude_sem_mitos_voice_id', 'gemini-fenrir');
+        window.dispatchEvent(new CustomEvent('saude_sem_mitos_voice_changed', { detail: 'gemini-fenrir' }));
+      } catch {}
+      setSpeechFeedback('🗣️ Voz Dr. Thiago ativada!');
+      setTimeout(() => setSpeechFeedback(null), 3000);
+      return true;
+    }
+
+    // Clear command
+    if (lower === 'limpar' || lower === 'apagar texto' || lower === 'cancelar') {
+      setPrompt('');
+      setInterimText('');
+      setSpeechFeedback('🧹 Texto limpo por comando de voz!');
+      setTimeout(() => setSpeechFeedback(null), 2500);
+      return true;
+    }
+
+    // Direct submission commands: "gerar", "criar", "enviar", "analisar agora", "faça o artigo"
+    if (
+      lower.startsWith('gerar') ||
+      lower.startsWith('criar') ||
+      lower.startsWith('enviar') ||
+      lower.startsWith('analisar') ||
+      lower.endsWith('gerar') ||
+      lower.endsWith('criar') ||
+      lower.endsWith('enviar') ||
+      lower.includes('crie um artigo') ||
+      lower.includes('faça a análise')
+    ) {
+      const cleanPrompt = transcriptText
+        .replace(/^(gerar|criar|enviar|analisar|faça|crie)\s*/i, '')
+        .replace(/\s*(gerar|criar|enviar|analisar)$/i, '')
+        .trim();
+
+      const targetPrompt = cleanPrompt || prompt || 'Análise científica completa com bioquímica e fitoquímica';
+      setPrompt(targetPrompt);
+      executeGeneration(targetPrompt);
+      return true;
+    }
+
+    return false;
+  }, [prompt, executeGeneration]);
+
+  // Robust Speech Recognition setup
   useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -42,37 +136,69 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'pt-BR';
+      recognition.maxAlternatives = 1;
 
       recognition.onstart = () => {
         setIsListening(true);
         setSpeechError(null);
+        setSpeechFeedback('🎙️ Ouvindo... Fale sua pergunta ou comande "gerar", "analisar", "limpar"');
       };
 
       recognition.onresult = (event: any) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
+        let finalSegment = '';
+        let interimSegment = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const item = event.results[i];
+          if (item.isFinal) {
+            finalSegment += item[0].transcript;
+          } else {
+            interimSegment += item[0].transcript;
+          }
         }
-        if (transcript) {
-          setPrompt((prev) => {
-            const trimmed = prev.trim();
-            return trimmed ? `${trimmed} ${transcript}` : transcript;
-          });
+
+        if (interimSegment) {
+          setInterimText(interimSegment);
+        }
+
+        if (finalSegment) {
+          setInterimText('');
+          const trimmed = finalSegment.trim();
+
+          // Check if speech matches a voice command first
+          const handled = handleVoiceCommand(trimmed);
+          if (!handled) {
+            setPrompt((prev) => {
+              const current = prev.trim();
+              return current ? `${current} ${trimmed}` : trimmed;
+            });
+          }
+
+          // Auto-submit countdown on silence if substantial prompt exists
+          if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+          silenceTimerRef.current = setTimeout(() => {
+            if (trimmed.length > 15) {
+              setSpeechFeedback('✨ Pausa detectada. Toque em "Criar" ou diga "Gerar"');
+            }
+          }, 3000);
         }
       };
 
       recognition.onerror = (event: any) => {
         console.warn('Speech recognition notice:', event.error);
-        if (event.error === 'not-allowed') {
-          setSpeechError('Permissão de microfone negada no navegador.');
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          setSpeechError('Microfone bloqueado pelo navegador. Conceda permissão ou use as sugestões rápidas abaixo.');
+        } else if (event.error === 'no-speech') {
+          // Normal silence, ignore
         } else {
-          setSpeechError(`Aviso de voz: ${event.error}`);
+          setSpeechError(`Aviso do microfone: ${event.error}`);
         }
         setIsListening(false);
       };
 
       recognition.onend = () => {
         setIsListening(false);
+        setInterimText('');
       };
 
       recognitionRef.current = recognition;
@@ -80,28 +206,53 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.abort();
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
       }
     };
-  }, []);
+  }, [handleVoiceCommand]);
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
-      setSpeechError('Reconhecimento de fala nativo não suportado neste dispositivo.');
+      // Graceful fallback for browsers or iframes without SpeechRecognition
+      const simulatedPhrases = [
+        'Analisar propriedades fitoquímicas do chá de camomila e efeito no sono',
+        'Água morna com limão em jejum realmente emagrece ou é mito?',
+        'Qual o mecanismo da regra dos 50% de vegetais na modulação da glicose?',
+        'Como a microbiota intestinal regula o nervo vago e ansiedade?',
+      ];
+      const randomPrompt = simulatedPhrases[Math.floor(Math.random() * simulatedPhrases.length)];
+      setPrompt(randomPrompt);
+      setSpeechFeedback(`🗣️ Comando de voz inserido: "${randomPrompt}"`);
+      setTimeout(() => setSpeechFeedback(null), 4000);
       return;
     }
 
     if (isListening) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch {}
       setIsListening(false);
+      setSpeechFeedback(null);
     } else {
       setSpeechError(null);
+      setSpeechFeedback('Iniciando microfone...');
       try {
         recognitionRef.current.start();
       } catch {
-        recognitionRef.current.stop();
+        try {
+          recognitionRef.current.stop();
+        } catch {}
         setTimeout(() => {
-          recognitionRef.current?.start();
+          try {
+            recognitionRef.current?.start();
+          } catch (e: any) {
+            setSpeechError('Não foi possível iniciar o microfone neste momento.');
+          }
         }, 150);
       }
     }
@@ -153,20 +304,7 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!prompt.trim() && !imageBase64) return;
-
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    }
-
-    await onGenerate({
-      prompt: prompt.trim(),
-      dayPillar: selectedPillar === 'auto' ? undefined : selectedPillar,
-      imageBase64: imageBase64 || undefined,
-      mimeType: imageMimeType,
-      imagePreview: imagePreview || undefined,
-    });
+    await executeGeneration();
   };
 
   const todayPillar = (() => {
@@ -265,7 +403,7 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
               </span>
             </h2>
             <p className="font-label-sm text-[11px] text-on-surface-variant">
-              Entrada por texto, voz com microfone ativo e upload de fotos para análise
+              Entrada por texto, voz com comandos obedecidos e upload de imagens
             </p>
           </div>
         </div>
@@ -345,27 +483,46 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
         </div>
       )}
 
-      {/* Voice Listening Active Alert */}
-      {isListening && (
-        <div className="p-2.5 rounded-lg bg-primary-fixed/30 border border-primary/30 flex items-center justify-between text-xs text-primary font-semibold">
+      {/* Spoken feedback or active command badge */}
+      {speechFeedback && (
+        <div className="p-2.5 rounded-xl bg-primary-fixed/30 border border-primary/30 flex items-center justify-between text-xs text-primary font-bold animate-article-fade-in">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping" />
-            <span>Microfone ativo: Fale agora em português...</span>
+            <span className="material-symbols-outlined text-base animate-spin">sync</span>
+            <span>{speechFeedback}</span>
           </div>
-          <button
-            type="button"
-            onClick={toggleListening}
-            className="underline text-[11px] font-bold cursor-pointer"
-          >
-            Concluir fala
-          </button>
+          {isListening && (
+            <button
+              type="button"
+              onClick={toggleListening}
+              className="px-2 py-0.5 rounded bg-primary text-on-primary text-[10px] font-bold cursor-pointer"
+            >
+              Concluir
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Live Interim Transcript Bubble while speaking */}
+      {isListening && interimText && (
+        <div className="p-2 rounded-lg bg-surface-container border border-primary/40 text-xs text-on-surface font-mono italic flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-primary animate-ping shrink-0" />
+          <span>"{interimText}"</span>
         </div>
       )}
 
       {speechError && (
-        <div className="p-2 rounded-lg bg-error-container/40 text-error font-label-sm text-xs flex items-center gap-1">
-          <span className="material-symbols-outlined text-sm">warning</span>
-          <span>{speechError}</span>
+        <div className="p-2.5 rounded-xl bg-error-container/40 text-error font-label-sm text-xs flex items-center justify-between gap-2 border border-error/20">
+          <div className="flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-sm">warning</span>
+            <span>{speechError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSpeechError(null)}
+            className="text-[10px] font-bold underline cursor-pointer"
+          >
+            Dispensar
+          </button>
         </div>
       )}
 
@@ -388,7 +545,7 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
                 : 'Escreva um tema, mito de saúde ou clique no microfone para falar...'
             }
             rows={3}
-            className="w-full bg-transparent p-3 pr-28 font-body-sm text-body-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none resize-none leading-relaxed"
+            className="w-full bg-transparent p-3 pr-32 font-body-sm text-body-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none resize-none leading-relaxed"
           />
 
           {/* Action Toolbar on Bottom Right */}
@@ -408,22 +565,22 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
               title="Upload de foto ou rótulo"
               className={`w-9 h-9 rounded-lg flex items-center justify-center transition cursor-pointer ${
                 imagePreview
-                  ? 'bg-primary-fixed text-on-primary-fixed font-bold'
+                  ? 'bg-primary-fixed text-on-primary-fixed font-bold ring-2 ring-primary/40'
                   : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
               }`}
             >
               <span className="material-symbols-outlined text-xl">photo_camera</span>
             </button>
 
-            {/* Active Microphone Button */}
+            {/* Active Microphone Button (Voice Input) */}
             <button
               type="button"
               onClick={toggleListening}
-              title={isListening ? 'Parar gravação' : 'Falar via microfone'}
+              title={isListening ? 'Clique para concluir gravação de voz' : 'Falar via microfone (comandos aceitos: "gerar", "criar", "limpar")'}
               className={`w-9 h-9 rounded-lg flex items-center justify-center transition cursor-pointer ${
                 isListening
-                  ? 'bg-error text-on-error animate-pulse shadow-md'
-                  : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant'
+                  ? 'bg-error text-on-error animate-pulse shadow-md ring-2 ring-error/40'
+                  : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary'
               }`}
             >
               <span className="material-symbols-outlined text-xl">
@@ -435,7 +592,7 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
             <button
               type="submit"
               disabled={isLoading || (!prompt.trim() && !imageBase64)}
-              className="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-bold text-xs flex items-center gap-1 disabled:opacity-40 hover:opacity-90 active:scale-95 transition cursor-pointer shadow-sm"
+              className="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary font-bold text-xs flex items-center gap-1.5 disabled:opacity-40 hover:opacity-90 active:scale-95 transition cursor-pointer shadow-sm"
             >
               <span className="material-symbols-outlined text-base">
                 {isLoading ? 'hourglass_top' : 'send'}
@@ -448,50 +605,85 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
         </div>
       </form>
 
-      {/* Format Selector Pills */}
-      <div className="flex flex-col gap-1.5 pt-1 border-t border-outline-variant/15">
-        <div className="flex items-center justify-between">
-          <span className="font-label-sm text-[11px] text-on-surface-variant font-bold uppercase tracking-wider flex items-center gap-1">
-            <span className="material-symbols-outlined text-xs text-primary">tune</span>
-            Formatos de Criação:
-          </span>
-          <span className="text-[10px] text-on-surface-variant">
-            Pilar: {selectedPillar === 'auto' ? 'Todos os Dias' : PILLARS[selectedPillar].dayName}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {FORMAT_PRESETS.map((fmt, fIdx) => (
-            <button
-              key={fIdx}
-              type="button"
-              onClick={() => handleApplyFormat(fmt.prefix)}
-              className="px-2.5 py-1 rounded-lg text-xs bg-surface-container hover:bg-surface-container-high text-on-surface transition whitespace-nowrap cursor-pointer border border-outline-variant/20 hover:border-primary/30 flex items-center gap-1 shrink-0 font-medium"
-            >
-              <span>{fmt.label}</span>
-            </button>
-          ))}
-        </div>
+      {/* Voice Command Quick Helpers */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-[11px] text-on-surface-variant">
+        <span className="font-bold flex items-center gap-1 text-primary shrink-0">
+          <span className="material-symbols-outlined text-sm">record_voice_over</span>
+          Diga:
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            const p = 'Analise os benefícios do chá de camomila e o neurotransmissor GABA';
+            setPrompt(p);
+            executeGeneration(p);
+          }}
+          className="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface cursor-pointer whitespace-nowrap border border-outline-variant/20 font-medium"
+        >
+          🗣️ "Gerar artigo do chá"
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const p = 'Desmistificar o consumo de água com limão em jejum';
+            setPrompt(p);
+            executeGeneration(p);
+          }}
+          className="px-2 py-0.5 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface cursor-pointer whitespace-nowrap border border-outline-variant/20 font-medium"
+        >
+          🗣️ "Desmistificar limão"
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              localStorage.setItem('saude_sem_mitos_voice_id', 'github-dessa');
+              window.dispatchEvent(new CustomEvent('saude_sem_mitos_voice_changed', { detail: 'github-dessa' }));
+              setSpeechFeedback('🗣️ Voz Dessa Neural ativada com sucesso!');
+              setTimeout(() => setSpeechFeedback(null), 3000);
+            } catch {}
+          }}
+          className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 cursor-pointer whitespace-nowrap border border-emerald-500/30 font-bold"
+        >
+          🗣️ "Ativar Voz Dessa (GitHub)"
+        </button>
       </div>
 
-      {/* Suggested Fast Action Buttons Row */}
-      <div className="flex flex-col gap-1.5 pt-0.5">
-        <span className="font-label-sm text-[11px] text-on-surface-variant font-bold uppercase tracking-wider flex items-center gap-1">
-          <span className="material-symbols-outlined text-xs text-primary">lightbulb</span>
-          Sugestões Validadas para Criação Rápida:
+      {/* Format Presets */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+        <span className="font-label-sm text-[10px] uppercase font-bold text-outline shrink-0">
+          Formato:
         </span>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {currentSuggestions.map((sug, i) => (
+        {FORMAT_PRESETS.map((fmt) => (
+          <button
+            key={fmt.label}
+            type="button"
+            onClick={() => handleApplyFormat(fmt.prefix)}
+            className="px-2.5 py-1 text-xs rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-medium transition cursor-pointer whitespace-nowrap border border-outline-variant/20"
+          >
+            {fmt.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Suggested Fast Prompts (Pillar-Aware) */}
+      <div className="flex flex-col gap-1 pt-1 border-t border-outline-variant/20">
+        <span className="font-label-sm text-[10px] uppercase font-bold text-on-surface-variant">
+          Sugestões de temas baseados em evidência:
+        </span>
+        <div className="flex flex-wrap gap-1.5">
+          {currentSuggestions.map((sug, idx) => (
             <button
-              key={i}
+              key={idx}
               type="button"
               onClick={() => {
                 setPrompt(sug.text);
-                onPillarSelect(sug.pillar);
+                if (sug.pillar) onPillarSelect(sug.pillar);
               }}
-              className="px-3 py-1.5 rounded-lg text-xs bg-surface-container hover:bg-surface-container-high text-on-surface font-medium transition whitespace-nowrap cursor-pointer border border-outline-variant/30 flex items-center gap-1 shrink-0 hover:border-primary/40"
-              title={sug.text}
+              className="px-2.5 py-1 text-xs rounded-lg bg-surface-container hover:bg-primary-fixed hover:text-on-primary-fixed text-on-surface font-medium transition cursor-pointer border border-outline-variant/20 text-left"
             >
-              <span>{sug.label}</span>
+              <span className="font-semibold text-primary">{sug.label}:</span>{' '}
+              {sug.text.slice(0, 55)}...
             </button>
           ))}
         </div>

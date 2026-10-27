@@ -9,6 +9,7 @@ interface HeaderProps {
   onDeployClick?: () => void;
   isDarkMode?: boolean;
   onToggleDarkMode?: () => void;
+  activeVoiceName?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   onDeployClick,
   isDarkMode = true,
   onToggleDarkMode,
+  activeVoiceName,
 }) => {
   return (
     <header className="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.06)] border-b border-outline-variant/30">
@@ -53,6 +55,21 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* User Profile, Theme Toggle & Voice Settings */}
         <div className="flex items-center gap-1 sm:gap-2">
+          {/* Active Voice Indicator & Quick Settings */}
+          {onVoiceSettingsClick && (
+            <button
+              onClick={onVoiceSettingsClick}
+              title={`Voz Ativa no Site: ${activeVoiceName || 'Dessa Neural (GitHub)'} - Clique para alterar ou ouvir amostras`}
+              className="px-2 sm:px-2.5 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 cursor-pointer text-xs font-semibold"
+            >
+              <span className="material-symbols-outlined text-base text-primary">record_voice_over</span>
+              <span className="hidden sm:inline max-w-[120px] truncate text-on-surface font-bold text-[11px]">
+                {activeVoiceName || 'Dessa Neural'}
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" title="Voz fixada no site" />
+            </button>
+          )}
+
           {/* Deploy & Platforms Status Button */}
           {onDeployClick && (
             <button
@@ -73,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onToggleDarkMode}
               title={isDarkMode ? 'Mudar para Modo Claro' : 'Ativar Modo Escuro'}
               aria-label="Alternar modo escuro ou claro"
-              className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors active:scale-95 cursor-pointer"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors active:scale-95 cursor-pointer"
             >
               <span className="material-symbols-outlined text-xl">
                 {isDarkMode ? 'light_mode' : 'dark_mode'}
@@ -81,20 +98,10 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {onVoiceSettingsClick && (
-            <button
-              onClick={onVoiceSettingsClick}
-              title="Configurar Voz Neural Realista 2026 da Assistente"
-              className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors active:scale-95 cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-xl">record_voice_over</span>
-            </button>
-          )}
-
           <div className="relative flex items-center justify-center">
             <button
               onClick={onProfileClick}
-              className="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface transition-colors active:scale-95 cursor-pointer"
+              className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface transition-colors active:scale-95 cursor-pointer"
             >
               <img
                 alt="Profile"
@@ -102,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
                 src={ASSETS.profile}
               />
             </button>
-            <span className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 bg-primary rounded-full ring-2 ring-surface animate-pulse" />
+            <span className="absolute bottom-1 right-1 w-2.5 h-2.5 bg-primary rounded-full ring-2 ring-surface animate-pulse" />
           </div>
         </div>
       </div>
