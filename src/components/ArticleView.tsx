@@ -27,29 +27,43 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   const getPillarBadgeClasses = (pilarId: string) => {
     switch (pilarId) {
-      case 'quarta':
-        return 'bg-[#F0FDF4] text-[#166534] dark:bg-emerald-950/70 dark:text-emerald-300 dark:border dark:border-emerald-800/40';
       case 'segunda':
+        return 'bg-[#F0FDF4] text-[#166534] dark:bg-emerald-950/70 dark:text-emerald-300 dark:border dark:border-emerald-800/40';
+      case 'terca':
+        return 'bg-[#FAF5FF] text-[#6B21A8] dark:bg-purple-950/70 dark:text-purple-300 dark:border dark:border-purple-800/40';
+      case 'quarta':
         return 'bg-[#ECFDF5] text-[#065F46] dark:bg-teal-950/70 dark:text-teal-300 dark:border dark:border-teal-800/40';
+      case 'quinta':
+        return 'bg-[#F0FDFA] text-[#115E59] dark:bg-teal-950/70 dark:text-teal-300 dark:border dark:border-teal-800/40';
       case 'sexta':
         return 'bg-[#EFF6FF] text-[#1E40AF] dark:bg-blue-950/70 dark:text-blue-300 dark:border dark:border-blue-800/40';
       case 'sabado':
-      default:
         return 'bg-[#FFFBEB] text-[#B45309] dark:bg-amber-950/70 dark:text-amber-300 dark:border dark:border-amber-800/40';
+      case 'domingo':
+        return 'bg-[#EEF2FF] text-[#3730A3] dark:bg-indigo-950/70 dark:text-indigo-300 dark:border dark:border-indigo-800/40';
+      default:
+        return 'bg-[#F0FDF4] text-[#166534] dark:bg-emerald-950/70 dark:text-emerald-300 dark:border dark:border-emerald-800/40';
     }
   };
 
   const getPillarIcon = (pilarId: string) => {
     switch (pilarId) {
-      case 'quarta':
-        return 'psychiatry';
       case 'segunda':
         return 'restaurant';
+      case 'terca':
+        return 'psychology';
+      case 'quarta':
+        return 'psychiatry';
+      case 'quinta':
+        return 'vital_signs';
       case 'sexta':
         return 'bedtime';
       case 'sabado':
-      default:
         return 'verified_user';
+      case 'domingo':
+        return 'self_improvement';
+      default:
+        return 'auto_awesome';
     }
   };
 

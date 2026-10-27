@@ -1,4 +1,11 @@
-export type PillarDay = 'segunda' | 'quarta' | 'sexta' | 'sabado';
+export type PillarDay =
+  | 'segunda'
+  | 'terca'
+  | 'quarta'
+  | 'quinta'
+  | 'sexta'
+  | 'sabado'
+  | 'domingo';
 
 export interface PillarInfo {
   id: PillarDay;
@@ -50,6 +57,29 @@ export interface ScientificVerdict {
   status: 'COMPROVADO' | 'COMPROVADO COM RESSALVAS' | 'DESMISTIFICADO / FALSO' | 'SEM EVIDÊNCIA CLÍNICA';
   evidenceLevel: string;
   summary: string;
+}
+
+export interface CarouselSlide {
+  slideNumber: number;
+  label: string;
+  title: string;
+  body: string;
+  visualNote: string;
+}
+
+export interface EditorialPlanItem {
+  dayId: PillarDay;
+  dayName: string;
+  theme: string;
+  headline: string;
+  format: 'Artigo + Áudio' | 'Carrossel 5 Slides' | 'Reels / Vídeo Curto' | 'Infusão & Guia Clínico';
+  objective: string;
+  carouselSlides: CarouselSlide[];
+  hookOptions: string[];
+  scientificEvidence: string;
+  suggestedPrompt: string;
+  articleId: string;
+  keyFindings: string[];
 }
 
 export interface GeneratedArticle {

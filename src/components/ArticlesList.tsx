@@ -19,11 +19,10 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
   const filteredArticles = articles.filter((art) => {
     const matchesFilter =
       selectedFilter === 'all' ||
-      (selectedFilter === 'segunda' && art.pilar_dia.toLowerCase().includes('segunda')) ||
-      (selectedFilter === 'quarta' && art.pilar_dia.toLowerCase().includes('quarta')) ||
-      (selectedFilter === 'sexta' && art.pilar_dia.toLowerCase().includes('sexta')) ||
-      (selectedFilter === 'sabado' &&
-        (art.pilar_dia.toLowerCase().includes('sábado') || art.pilar_dia.toLowerCase().includes('sabado')));
+      art.pilarId === selectedFilter ||
+      art.pilar_dia.toLowerCase().includes(selectedFilter) ||
+      (selectedFilter === 'sabado' && art.pilar_dia.toLowerCase().includes('sábado')) ||
+      (selectedFilter === 'terca' && art.pilar_dia.toLowerCase().includes('terça'));
 
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
@@ -89,8 +88,10 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({
           {Object.values(PILLARS).map((p) => {
             const isSelected = selectedFilter === p.id;
             const count = articles.filter((a) =>
+              a.pilarId === p.id ||
               a.pilar_dia.toLowerCase().includes(p.id) ||
-              (p.id === 'sabado' && a.pilar_dia.toLowerCase().includes('sábado'))
+              (p.id === 'sabado' && a.pilar_dia.toLowerCase().includes('sábado')) ||
+              (p.id === 'terca' && a.pilar_dia.toLowerCase().includes('terça'))
             ).length;
 
             return (

@@ -6,6 +6,7 @@ interface HeaderProps {
   onProfileClick?: () => void;
   onLogoClick?: () => void;
   onVoiceSettingsClick?: () => void;
+  onDeployClick?: () => void;
   isDarkMode?: boolean;
   onToggleDarkMode?: () => void;
 }
@@ -15,6 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   onProfileClick,
   onLogoClick,
   onVoiceSettingsClick,
+  onDeployClick,
   isDarkMode = true,
   onToggleDarkMode,
 }) => {
@@ -51,6 +53,20 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* User Profile, Theme Toggle & Voice Settings */}
         <div className="flex items-center gap-1 sm:gap-2">
+          {/* Deploy & Platforms Status Button */}
+          {onDeployClick && (
+            <button
+              onClick={onDeployClick}
+              title="Central de Atualização e Deploy (GitHub • Netlify • Vercel)"
+              aria-label="Abrir central de atualização e deploy"
+              className="px-2.5 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 cursor-pointer text-xs font-bold border border-outline-variant/30"
+            >
+              <span className="material-symbols-outlined text-base text-primary">cloud_sync</span>
+              <span className="hidden md:inline">Deploy</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </button>
+          )}
+
           {/* Dark Mode Toggle Button */}
           {onToggleDarkMode && (
             <button

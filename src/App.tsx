@@ -12,11 +12,17 @@ import { HomeDashboard } from './components/HomeDashboard';
 import { ArticlesList } from './components/ArticlesList';
 import { MythsView } from './components/MythsView';
 import { VoiceSettingsModal, AVAILABLE_VOICES } from './components/VoiceSettingsModal';
+import { DeployModal } from './components/DeployModal';
 import { GeneratedArticle, PillarDay } from './types/content';
-import { PROTO_CHAMOMILE_ARTICLE, PROTO_MYTH_ARTICLE, INITIAL_ARTICLES_LIST, ASSETS } from './data/constants';
+import {
+  PROTO_CHAMOMILE_ARTICLE,
+  INITIAL_ARTICLES_LIST,
+  ASSETS,
+  getCurrentDayPillar,
+} from './data/constants';
 import { requestContentGeneration } from './services/contentService';
 
-const STORAGE_KEY = 'saude_sem_mitos_articles_v2';
+const STORAGE_KEY = 'saude_sem_mitos_articles_v3';
 const VOICE_STORAGE_KEY = 'saude_sem_mitos_voice_id';
 const THEME_STORAGE_KEY = 'saude_sem_mitos_theme_v1';
 
@@ -39,12 +45,18 @@ export default function App() {
     }
   });
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [articles, setArticles] = useState<GeneratedArticle[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length >= 7) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Merge custom created articles with INITIAL_ARTICLES_LIST
+          const customArticles = parsed.filter((p: any) => !INITIAL_ARTICLES_LIST.some((init) => init.id === p.id));
+          return [...customArticles, ...INITIAL_ARTICLES_LIST];
+        }
       }
     } catch (e) {
       console.warn('Could not read from storage:', e);
@@ -52,7 +64,11 @@ export default function App() {
     return INITIAL_ARTICLES_LIST;
   });
 
-  const [selectedArticle, setSelectedArticle] = useState<GeneratedArticle>(PROTO_CHAMOMILE_ARTICLE);
+  const [selectedArticle, setSelectedArticle] = useState<GeneratedArticle>(() => {
+    const today = getCurrentDayPillar();
+    const found = INITIAL_ARTICLES_LIST.find((a) => a.pilarId === today);
+    return found || PROTO_CHAMOMILE_ARTICLE;
+  });
   const [selectedPillar, setSelectedPillar] = useState<PillarDay | 'auto'>('auto');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -246,6 +262,7 @@ export default function App() {
         onLogoClick={() => setActiveTab('inicio')}
         onProfileClick={() => setActiveTab('assistente-ia')}
         onVoiceSettingsClick={() => setIsVoiceModalOpen(true)}
+        onDeployClick={() => setIsDeployModalOpen(true)}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
       />
@@ -364,6 +381,16 @@ export default function App() {
         onClose={() => setIsVoiceModalOpen(false)}
         selectedVoiceId={selectedVoiceId}
         onSelectVoice={handleSelectVoice}
+      />
+
+      {/* Deploy & Platforms Central Modal */}
+      <DeployModal
+        isOpen={isDeployModalOpen}
+        onClose={() => setIsDeployModalOpen(false)}
+        onSelectDayPillar={(day) => {
+          setSelectedPillar(day);
+          setActiveTab('assistente-ia');
+        }}
       />
 
       {/* Fixed Bottom Navigation Bar */}

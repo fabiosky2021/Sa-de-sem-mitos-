@@ -196,19 +196,148 @@ const PILLAR_DATABASE: Record<PillarDay, GeneratedContentResponse> = {
       'The New England Journal of Medicine - Acid-Base and Electrolyte Disorders'
     ],
     aviso_legal: DEFAULT_DISCLAIMER
+  },
+  terca: {
+    categoria: 'Saúde Mental & Neurociência',
+    pilar_dia: 'Terça-feira',
+    titulo: 'O Eixo Intestino-Cérebro: Como a Microbiota Modula o Cortisol e a Ansiedade',
+    subtitulo: 'A fascinante conexão entre a permeabilidade intestinal, a síntese de serotonina e a resiliência neural.',
+    resumo: 'Cerca de 90% da serotonina corporal é sintetizada no trato digestivo. Entenda os mecanismos do nervo vago e dos ácidos graxos de cadeia curta no humor.',
+    conteudo_paragrafos: [
+      'A neurociência e a gastroenterologia moderna convergem para um fato transformador: o intestino é o nosso segundo cérebro. Através do nervo vago e da corrente sanguínea, trilhões de microrganismos dialogam em tempo real com o sistema límbico.',
+      'Bactérias benéficas fermentam fibras solúveis, produzindo ácidos graxos de cadeia curta (como butirato e acetato). Essas substâncias fortalecem a barreira hematoencefálica e atenuam a resposta inflamatória induzida pelo estresse.',
+      'O cortisol elevado cronicamente altera a integridade da barreira intestinal (leaky gut), permitindo que endotoxinas bacterianas estimulem neuroinflamação subclínica, associada à fadiga mental e sintomas de ansiedade.',
+      'Intervenções com alimentos fermentados (kefir, iogurte natural sem açúcar), ingestão variada de fibras prebióticas e pausas conscientes reduzem comprovadamente os marcadores inflamatórios cerebrais.'
+    ],
+    mito_desmistificado: 'Mito: "Ansiedade e estresse são apenas problemas psicológicos da mente e nada têm a ver com a digestão."',
+    fato_cientifico: 'Fato: O eixo bidirecional microbiota-intestino-cérebro responde diretamente à dieta e ao microbioma, com forte impacto na modulação de neurotransmissores como GABA e serotonina.',
+    dicas_praticas: [
+      'Consuma ao menos 20 a 30 tipos diferentes de plantas por semana (legumes, folhas, sementes, frutas e grãos).',
+      'Evite adoçantes artificiais em excesso, pois alguns tipos alteram negativamente a microbiota benéfica.',
+      'Pratique 5 minutos de respiração diafragmática lenta (4s inspirando, 6s expirando) para estimular o tônus vagal.'
+    ],
+    roteiro_video: {
+      titulo_video: 'Como o seu intestino controla o seu humor e ansiedade',
+      gancho_inicial: 'Você sente borboletas no estômago quando está ansioso? A ciência explica por quê!',
+      desenvolvimento: 'Mais de 90% da serotonina é produzida no seu trato gastrointestinal. Cuidar das bactérias boas do intestino com fibras reais é o primeiro passo para acalmar a mente.',
+      chamada_para_acao: 'Comente qual alimento fermentado você consome no dia a dia!',
+      legendas_sugeridas: [
+        '0:00 - A conexão intestino e mente',
+        '0:18 - O papel do nervo vago',
+        '0:35 - Fibras prebióticas e serotonina',
+        '0:55 - Dicas para fortalecer a microbiota'
+      ]
+    },
+    audio_script: 'Terça-feira de Saúde Mental e Neurociência no Saúde Sem Mitos! Hoje desvendamos o eixo intestino-cérebro. Uma mente equilibrada depende de uma microbiota saudável. Priorize comida de verdade e alimente suas bactérias protetoras.',
+    tags: ['SaudeMental', 'Neurociencia', 'EixoIntestinoCerebro', 'Microbiota', 'GABA', 'Serotonina'],
+    referencias_cientificas: [
+      'Cryan JF, et al. The Microbiota-Gut-Brain Axis. Physiological Reviews (2019)',
+      'Nature Microbiology - Gut bacteria that produce neuroactive compounds',
+      'Cell - Vagus nerve pathways in psychological homeostasis'
+    ],
+    aviso_legal: DEFAULT_DISCLAIMER
+  },
+  quinta: {
+    categoria: 'Metabolismo & Longevidade',
+    pilar_dia: 'Quinta-feira',
+    titulo: 'Sensibilidade à Insulina e Autofagia: A Ordem dos Alimentos para Achatar Picos Glicêmicos',
+    subtitulo: 'Estratégias metabólicas simples para proteger as mitocôndrias, evitar sonolência pós-prandial e promover longevidade.',
+    resumo: 'Estudos clínicos revelam que consumir vegetais ricos em fibras antes dos carboidratos reduz picos de glicose em até 70% e melhora a eficiência mitocondrial.',
+    conteudo_paragrafos: [
+      'A longevidade biológica está intimamente associada à estabilidade glicêmica e ao controle da insulina. Picos rápidos de açúcar no sangue forçam o pâncreas a secretar grandes cargas insulínicas, gerando estresse oxidativo endotelial e acúmulo de gordura visceral.',
+      'Uma das descobertas mais práticas da nutrição metabólica recente é o sequenciamento alimentar: ao iniciar a refeição pelas fibras (saladas e vegetais crus), cria-se uma rede gelatinosa no intestino delgado que retarda a absorção dos açúcares seguintes.',
+      'Em seguida, o consumo de proteínas e gorduras boas sinaliza saciedade via GLP-1 e colecistoquinina (CCK). Deixar os carboidratos complexos por último atenua drasticamente a curva glicêmica e previne o crash de energia pós-almoço.',
+      'Além disso, períodos de repouso alimentar noturno de 12 horas permitem que a via AMPK seja ativada, favorecendo a autofagia e a biogênese mitocondrial.'
+    ],
+    mito_desmistificado: 'Mito: "Picos de glicose só afetam pessoas diabéticas e não têm importância para indivíduos saudáveis."',
+    fato_cientifico: 'Fato: Oscilações glicêmicas acentuadas provocam glicação de proteínas (AGEs), disfunção mitocondrial e inflamação crônica silenciosa em qualquer indivíduo.',
+    dicas_praticas: [
+      'Inicie sempre almoço e jantar com uma porção generosa de folhas e vegetais crus.',
+      'Caminhe 10 a 15 minutos em ritmo leve logo após grandes refeições para ativar captação muscular de glicose via GLUT-4 sem dependência excessiva de insulina.',
+      'Evite sucos de fruta concentrados; prefira a fruta inteira com casca e bagaço para preservar as fibras.'
+    ],
+    roteiro_video: {
+      titulo_video: 'O truque simples para comer carboidrato sem dar sono e engordar',
+      gancho_inicial: 'Você sente aquela moleza incontrolável depois de almoçar? Mudar a ordem do prato resolve!',
+      desenvolvimento: 'Coma a salada primeiro, depois a proteína e por último o arroz ou batata. Essa ordem simples reduz o pico de insulina e mantém seu cérebro focado a tarde toda.',
+      chamada_para_acao: 'Faça o teste amanhã e volte aqui para me contar se sentiu mais energia!',
+      legendas_sugeridas: [
+        '0:00 - O pico glicêmico invisível',
+        '0:15 - A ordem correta: fibras, proteínas, carboidratos',
+        '0:35 - Como o GLUT-4 age nos músculos',
+        '0:50 - Benefícios comprovados na longevidade'
+      ]
+    },
+    audio_script: 'Quinta-feira de Metabolismo e Longevidade no Saúde Sem Mitos! A estabilidade da sua glicose é a chave para energia constante e envelhecimento celular saudável. Altere a ordem dos alimentos e sinta a diferença metabólica.',
+    tags: ['Metabolismo', 'Longevidade', 'Glicemia', 'Insulina', 'Bioenergetica', 'MitoCondrias'],
+    referencias_cientificas: [
+      'Shukla AP, et al. Food Order Has a Significant Impact on Postprandial Glucose and Insulin Levels. Diabetes Care (2015)',
+      'The Lancet Diabetes & Endocrinology - Glucose variability and cardiovascular risk',
+      'Cell Metabolism - Nutrient sensing and autophagy regulation'
+    ],
+    aviso_legal: DEFAULT_DISCLAIMER
+  },
+  domingo: {
+    categoria: 'Recuperação & Planejamento',
+    pilar_dia: 'Domingo',
+    titulo: 'Descanso Ativo e Meal Prep Consciente: Como Preparar a Próxima Semana com Ciência',
+    subtitulo: 'Técnicas de higienização de vegetais para longa conservação e descompressão do sistema nervoso autônomo.',
+    resumo: 'Transforme o domingo em um divisor de águas: planejamento nutricional sem estresse e práticas de descompressão simpática para iniciar a segunda-feira no ápice de disposição.',
+    conteudo_paragrafos: [
+      'O domingo não precisa ser sinônimo de angústia pré-segunda-feira. Pelo contrário: a fisiologia do descanso ativo indica que atividades de baixa intensidade na natureza, alongamentos e desconexão de telas promovem a transição do sistema simpático (luta ou fuga) para o parassimpático (restauração).',
+      'No âmbito nutricional, a adesão a uma rotina alimentar saudável é decidida na organização prévia. Dedicar 40 minutos para higienizar folhas (imersão em hipoclorito, secagem rigorosa e armazenamento com papel toalha em potes herméticos) garante saladas frescas para a semana toda.',
+      'Cozinhar leguminosas e raízes com antecedência e congelar em porções individuais previne escolhas impulsivas por delivery ultraprocessado nos dias de cansaço extremo.',
+      'Termine o dia com um banho morno e um momento de leitura em luz baixa para sinalizar ao hipotálamo que o ciclo semanal começará com clareza e vigor.'
+    ],
+    mito_desmistificado: 'Mito: "Descansar significa ficar o dia todo deitado na cama usando o celular até tarde."',
+    fato_cientifico: 'Fato: A rolagem passiva de redes sociais gera sobrecarga sensorial e mantém o córtex visual e pré-frontal em estado de alerta, impedindo a recuperação neural profunda.',
+    dicas_praticas: [
+      'Seque muito bem as folhas verdes antes de guardar; a umidade residual é a principal causadora de proliferação bacteriana e folhas murchas.',
+      'Faça um detox digital de ao menos 4 horas no domingo para resetar os circuitos dopaminérgicos.',
+      'Deixe a garrafa de água e o tênis de treino separados para a manhã de segunda-feira.'
+    ],
+    roteiro_video: {
+      titulo_video: 'Como preparar seu corpo e mente no domingo para uma semana épica',
+      gancho_inicial: 'Bateu a famosa angústia de domingo à noite? Vamos virar essa chave agora com ciência!',
+      desenvolvimento: 'Descanso ativo, folhas verdes higienizadas para a semana e 2 horas sem telas antes de dormir. Pequenos hábitos de domingo garantem uma segunda-feira leve e cheia de foco.',
+      chamada_para_acao: 'Qual seu ritual preferido de domingo? Escreva nos comentários!',
+      legendas_sugeridas: [
+        '0:00 - O estresse da pré-segunda',
+        '0:18 - Como higienizar folhas para a semana toda',
+        '0:35 - Descanso parassimpático e sono',
+        '0:50 - Preparação para a nova semana'
+      ]
+    },
+    audio_script: 'Domingo no Saúde Sem Mitos! Dia de recuperação, autocuidado e planejamento. Quem se organiza no domingo governa sua semana e protege sua saúde contra o estresse crônico. Tenha uma excelente preparação.',
+    tags: ['DomingoDeRecuperacao', 'MealPrep', 'DescansoAtivo', 'OrganizacaoSaudavel', 'SaudeMental'],
+    referencias_cientificas: [
+      'American Journal of Lifestyle Medicine - Meal planning and adherence to dietary guidelines',
+      'Frontiers in Psychology - Nature exposure and autonomic nervous system recovery',
+      'Sleep Medicine Reviews - Evening screen use and sleep latency'
+    ],
+    aviso_legal: DEFAULT_DISCLAIMER
   }
 };
 
 export function inferPillarFromText(text: string): PillarDay {
   const normalized = (text || '').toLowerCase();
-  if (normalized.includes('quarta') || normalized.includes('chá') || normalized.includes('cha') || normalized.includes('infus') || normalized.includes('planta') || normalized.includes('erva')) {
+  if (normalized.includes('terça') || normalized.includes('terca') || normalized.includes('mental') || normalized.includes('mente') || normalized.includes('cérebro') || normalized.includes('cerebro') || normalized.includes('ansiedade') || normalized.includes('cortisol') || normalized.includes('foco') || normalized.includes('depress') || normalized.includes('neuro')) {
+    return 'terca';
+  }
+  if (normalized.includes('quarta') || normalized.includes('chá') || normalized.includes('cha') || normalized.includes('infus') || normalized.includes('planta') || normalized.includes('erva') || normalized.includes('fitoter')) {
     return 'quarta';
   }
-  if (normalized.includes('sexta') || normalized.includes('sono') || normalized.includes('hábito') || normalized.includes('habito') || normalized.includes('exerc') || normalized.includes('treino') || normalized.includes('hidrata')) {
+  if (normalized.includes('quinta') || normalized.includes('metabol') || normalized.includes('glicem') || normalized.includes('insulin') || normalized.includes('longev') || normalized.includes('mitoc') || normalized.includes('autofag') || normalized.includes('colesterol')) {
+    return 'quinta';
+  }
+  if (normalized.includes('sexta') || normalized.includes('sono') || normalized.includes('hábito') || normalized.includes('habito') || normalized.includes('exerc') || normalized.includes('treino') || normalized.includes('hidrata') || normalized.includes('circad')) {
     return 'sexta';
   }
-  if (normalized.includes('sábado') || normalized.includes('sabado') || normalized.includes('mito') || normalized.includes('fake') || normalized.includes('crença') || normalized.includes('mentira') || normalized.includes('verdade')) {
+  if (normalized.includes('sábado') || normalized.includes('sabado') || normalized.includes('mito') || normalized.includes('fake') || normalized.includes('crença') || normalized.includes('mentira') || normalized.includes('verdade') || normalized.includes('detox')) {
     return 'sabado';
+  }
+  if (normalized.includes('domingo') || normalized.includes('planeja') || normalized.includes('meal prep') || normalized.includes('recupera') || normalized.includes('descanso') || normalized.includes('estresse') || normalized.includes('relax')) {
+    return 'domingo';
   }
   return 'segunda';
 }

@@ -169,38 +169,85 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
     });
   };
 
-  const QUICK_SUGGESTIONS = [
-    {
-      label: '🥗 Analisar Prato / Dieta',
-      text: 'Como balancear este prato seguindo a regra dos 50% de vegetais e fontes proteicas?',
-      pillar: 'segunda' as PillarDay,
-    },
-    {
-      label: '🍵 Chá de Hibisco: Doses Seguras',
-      text: 'Quais os reais benefícios do chá de hibisco, dosagem diária recomendada e contraindicações?',
-      pillar: 'quarta' as PillarDay,
-    },
-    {
-      label: '❌ Mito: Água com Limão em Jejum',
-      text: 'Água morna com limão em jejum queima gordura e alcaliniza o organismo ou é mito?',
-      pillar: 'sabado' as PillarDay,
-    },
-    {
-      label: '😴 Protocolo de Higiene do Sono',
-      text: 'Quais hábitos ao acordar e ao deitar ajudam a sincronizar o ritmo circadiano e melatonina?',
-      pillar: 'sexta' as PillarDay,
-    },
-    {
-      label: '🔍 Ler Rótulo Nutricional',
-      text: 'O que devo observar no rótulo nutricional para não cair na armadilha de alimentos ultraprocessados?',
-      pillar: 'segunda' as PillarDay,
-    },
-    {
-      label: '💧 Meta Hídrica por Peso',
-      text: 'Como calcular a ingestão hídrica ideal para o peso e por que chá não substitui água pura?',
-      pillar: 'sexta' as PillarDay,
-    },
+  const todayPillar = (() => {
+    const day = new Date().getDay();
+    const map: Record<number, PillarDay> = {
+      0: 'domingo',
+      1: 'segunda',
+      2: 'terca',
+      3: 'quarta',
+      4: 'quinta',
+      5: 'sexta',
+      6: 'sabado',
+    };
+    return map[day] || 'segunda';
+  })();
+
+  const FORMAT_PRESETS = [
+    { label: '📱 Reels / Vídeo 60s', prefix: 'Roteiro dinâmico de vídeo curto (Reels/TikTok 60s): ' },
+    { label: '📑 Carrossel 5 Slides', prefix: 'Estrutura completa de carrossel de 5 slides com ganchos e visual: ' },
+    { label: '🎙️ Áudio-Pílula 3 min', prefix: 'Roteiro narrado humanizado de 3 minutos para podcast/áudio: ' },
+    { label: '🔬 Artigo Clínico Nível A', prefix: 'Artigo científico aprofundado com bioquímica, dosagens e referências: ' },
   ];
+
+  // Dynamic suggestions based on selected day pillar
+  const getSuggestionsForCurrentContext = () => {
+    if (selectedPillar !== 'auto') {
+      const pillarInfo = PILLARS[selectedPillar];
+      return pillarInfo.suggestedPrompts.map((promptText, idx) => ({
+        label: `${pillarInfo.dayName.split('-')[0]} #${idx + 1}`,
+        text: promptText,
+        pillar: selectedPillar as PillarDay,
+      }));
+    }
+
+    return [
+      {
+        label: '🥗 Seg: Regra dos 50% & Fibras',
+        text: 'Como balancear este prato seguindo a regra dos 50% de vegetais sem terrorismo aos carboidratos?',
+        pillar: 'segunda' as PillarDay,
+      },
+      {
+        label: '🧠 Ter: Eixo Intestino-Cérebro',
+        text: 'Como a microbiota intestinal modula serotonina e o nervo vago no controle da ansiedade?',
+        pillar: 'terca' as PillarDay,
+      },
+      {
+        label: '🍵 Qua: Chás & Neuroquímica',
+        text: 'Chá de camomila e erva-cidreira: o que a neurociência diz sobre GABA e sono reparador?',
+        pillar: 'quarta' as PillarDay,
+      },
+      {
+        label: '⚡ Qui: Ordem dos Alimentos',
+        text: 'Por que comer fibras e proteínas antes dos amidos achata picos de glicemia e evita fadiga?',
+        pillar: 'quinta' as PillarDay,
+      },
+      {
+        label: '😴 Sex: Fotobiologia do Sono',
+        text: 'Protocolo de higiene do sono: luz matinal, corte de telas e drenagem glinfática cerebral',
+        pillar: 'sexta' as PillarDay,
+      },
+      {
+        label: '❌ Sáb: Mito Água com Limão',
+        text: 'Água morna com limão em jejum queima gordura e alcaliniza o organismo ou é mito pseudocientífico?',
+        pillar: 'sabado' as PillarDay,
+      },
+      {
+        label: '🍱 Dom: Meal Prep Científico',
+        text: 'Meal Prep Inteligente: como higienizar, branquear e conservar vegetais para a semana toda sem estragar?',
+        pillar: 'domingo' as PillarDay,
+      },
+    ];
+  };
+
+  const currentSuggestions = getSuggestionsForCurrentContext();
+
+  const handleApplyFormat = (prefix: string) => {
+    setPrompt((prev) => {
+      const cleaned = prev.replace(/^.*?: /, '');
+      return `${prefix}${cleaned || 'Analise com rigor científico e dosagens práticas.'}`;
+    });
+  };
 
   return (
     <div className="w-full bg-surface-container-lowest rounded-2xl p-space-md shadow-md border border-outline-variant/30 flex flex-col gap-space-sm">
@@ -223,7 +270,7 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
           </div>
         </div>
 
-        {/* Pillar Switcher */}
+        {/* Pillar Switcher for All 7 Days */}
         <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           <button
             type="button"
@@ -238,18 +285,28 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
           </button>
           {Object.values(PILLARS).map((p) => {
             const isSelected = selectedPillar === p.id;
+            const isToday = p.id === todayPillar;
             return (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => onPillarSelect(p.id)}
-                className={`px-2.5 py-1 text-xs rounded-full font-semibold transition cursor-pointer whitespace-nowrap ${
+                title={isToday ? `${p.dayName} (Hoje)` : p.dayName}
+                className={`px-2.5 py-1 text-xs rounded-full font-semibold transition cursor-pointer whitespace-nowrap flex items-center gap-1 ${
                   isSelected
-                    ? `${p.badgeBg} ${p.badgeText} ring-1 ring-primary/30 shadow-sm`
+                    ? `${p.badgeBg} ${p.badgeText} ring-1 ring-primary/40 shadow-sm font-bold`
                     : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
                 }`}
               >
-                {p.dayName.split('-')[0]}
+                {isToday && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                )}
+                <span>{p.dayName.split('-')[0]}</span>
+                {isToday && (
+                  <span className="text-[9px] uppercase tracking-wider font-extrabold opacity-75">
+                    (Hoje)
+                  </span>
+                )}
               </button>
             );
           })}
@@ -391,13 +448,39 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
         </div>
       </form>
 
+      {/* Format Selector Pills */}
+      <div className="flex flex-col gap-1.5 pt-1 border-t border-outline-variant/15">
+        <div className="flex items-center justify-between">
+          <span className="font-label-sm text-[11px] text-on-surface-variant font-bold uppercase tracking-wider flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs text-primary">tune</span>
+            Formatos de Criação:
+          </span>
+          <span className="text-[10px] text-on-surface-variant">
+            Pilar: {selectedPillar === 'auto' ? 'Todos os Dias' : PILLARS[selectedPillar].dayName}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {FORMAT_PRESETS.map((fmt, fIdx) => (
+            <button
+              key={fIdx}
+              type="button"
+              onClick={() => handleApplyFormat(fmt.prefix)}
+              className="px-2.5 py-1 rounded-lg text-xs bg-surface-container hover:bg-surface-container-high text-on-surface transition whitespace-nowrap cursor-pointer border border-outline-variant/20 hover:border-primary/30 flex items-center gap-1 shrink-0 font-medium"
+            >
+              <span>{fmt.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Suggested Fast Action Buttons Row */}
-      <div className="flex flex-col gap-1.5 pt-1">
-        <span className="font-label-sm text-[11px] text-on-surface-variant font-bold uppercase tracking-wider">
-          Sugestões rápidas do estúdio:
+      <div className="flex flex-col gap-1.5 pt-0.5">
+        <span className="font-label-sm text-[11px] text-on-surface-variant font-bold uppercase tracking-wider flex items-center gap-1">
+          <span className="material-symbols-outlined text-xs text-primary">lightbulb</span>
+          Sugestões Validadas para Criação Rápida:
         </span>
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {QUICK_SUGGESTIONS.map((sug, i) => (
+          {currentSuggestions.map((sug, i) => (
             <button
               key={i}
               type="button"
@@ -405,7 +488,8 @@ export const StudioInputBar: React.FC<StudioInputBarProps> = ({
                 setPrompt(sug.text);
                 onPillarSelect(sug.pillar);
               }}
-              className="px-3 py-1.5 rounded-lg text-xs bg-surface-container hover:bg-surface-container-high text-on-surface font-medium transition whitespace-nowrap cursor-pointer border border-outline-variant/30 flex items-center gap-1 shrink-0"
+              className="px-3 py-1.5 rounded-lg text-xs bg-surface-container hover:bg-surface-container-high text-on-surface font-medium transition whitespace-nowrap cursor-pointer border border-outline-variant/30 flex items-center gap-1 shrink-0 hover:border-primary/40"
+              title={sug.text}
             >
               <span>{sug.label}</span>
             </button>
