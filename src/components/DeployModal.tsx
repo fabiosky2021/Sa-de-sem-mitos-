@@ -28,8 +28,8 @@ export const DeployModal: React.FC<DeployModalProps> = ({
   };
 
   const GIT_COMMANDS = `git add .
-git commit -m "feat: atualiza dias da semana e preparacao para GitHub, Netlify e Vercel"
-git push -u origin main`;
+git commit -m "fix: resolve esbuild peer dependency for Vercel npm install"
+git push origin main`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
